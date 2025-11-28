@@ -18,7 +18,7 @@ def geocode(address: str):
         return None
     else:
         params={
-            'q' : str.split(address, sep='+'),
+            'q' : address,
             'format' : 'jsonv2'}
         headers = {
         "User-Agent": "https://taxifare-782621711539.europe-west1.run.app/predict"}
@@ -77,17 +77,17 @@ pickup_latitude = geocode(pickup_location[1])
 dropoff_longitude = geocode(dropoff_location[0])
 dropoff_latitude = geocode(dropoff_location[1])
 
-params = {
+
+## PREDICTION OUTPUT
+if st.button("🚕 Predict fare"):
+    params = {
     "pickup_datetime": f"{date} {time}",
     "pickup_longitude": pickup_longitude,
     "pickup_latitude": pickup_latitude,
     "dropoff_longitude": dropoff_longitude,
     "dropoff_latitude": dropoff_latitude,
-    "passenger_count": passenger_count
-}
+    "passenger_count": passenger_count}
 
-
-## PREDICTION OUTPUT
 response = requests.get(url, params=params)
 prediction = response.json()['fare']
 
