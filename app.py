@@ -10,7 +10,7 @@ from datetime import datetime, time, date
 
 #  API URLS
 url = 'https://taxifare-782621711539.europe-west1.run.app/predict'
-geocode_api = 'https://nominatim.openstreetmap.org/ui/search'
+geocode_api = 'https://nominatim.openstreetmap.org/search'
 
 # GEOCODING FUNCTION
 def geocode(address: str):
