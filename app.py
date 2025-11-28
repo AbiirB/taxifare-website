@@ -1,9 +1,15 @@
 import streamlit as st
 import requests
+from datetime import datetime, time, date
 
-'''
-# TaxiFareModel front
-'''
+# ----------------- PAGE CONFIG -----------------
+st.set_page_config(
+    page_title="Taxi Fare Estimator",
+    page_icon="🚕",
+    layout="centered",
+    initial_sidebar_state="collapsed",
+)
+
 ## Here we would like to add some controllers in order to ask the user to select the parameters of the ride
 
 # st.markdown('''
