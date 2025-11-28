@@ -62,8 +62,8 @@ st.markdown('<div class="stCard">', unsafe_allow_html=True)
 st.markdown("### Enter the ride details:")
 
 pickup_date = st.date_input("When do you want to ride?", value=datetime.now().date())
-pickup_time = st.time_input("Pickup Time")
-passenger_count = st.number_input("Passenger Count", value=2)
+pickup_time = st.time_input("Pickup Time", value=datetime.now().time().replace(microsecond=0))
+passenger_count = st.number_input("Passenger Count", value=2, min_value=1, step=1)
 
 st.markdown("#### Locations")
 
@@ -76,44 +76,27 @@ dropoff_location = st.text_input(
     value="22 West 50th Street, New York, 10022",
 )
 
-# if pickup_location:
-#     lon, lat = geocode(pickup_location)
-#     if lon is None:
-#         st.warning("Could not find pickup location.")
-#     else:
-#         st.session_state["pickup_longitude"] = lon
-#         st.session_state["pickup_latitude"] = lat
-
-# dropoff_location = st.text_input("Where to?", value="22 West 50th Street, New York, 10022")
-# if dropoff_location:
-#     lon, lat = geocode(dropoff_location)
-#     if lon is None:
-#         st.warning("Could not find dropoff location.")
-#     else:
-#         st.session_state["pickup_longitude"] = lon
-#         st.session_state["pickup_latitude"] = lat
-
-
-# MY API INPUTS
-pickup_longitude = geocode(pickup_location[0])
-pickup_latitude = geocode(pickup_location[1])
-dropoff_longitude = geocode(dropoff_location[0])
-dropoff_latitude = geocode(dropoff_location[1])
-
-
 ## PREDICTION OUTPUT
 if st.button("🚕 Predict fare"):
-    params = {
-    "pickup_datetime": f"{pickup_date} {pickup_time}",
-    "pickup_longitude": pickup_longitude,
-    "pickup_latitude": pickup_latitude,
-    "dropoff_longitude": dropoff_longitude,
-    "dropoff_latitude": dropoff_latitude,
-    "passenger_count": passenger_count}
 
-    with st.spinner("Contacting fare prediction API..."):
-            response = requests.get(url, params=params)
+    pickup_longitude, pickup_latitude = geocode(pickup_location)
+    dropoff_longitude, dropoff_latitude = geocode(dropoff_location)
+
+    if None in (pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude):
+        st.error("Could not geocode one of the locations. Please check the addresses.")
+    else:
+        params = {
+            "pickup_datetime": f"{pickup_date} {pickup_time}",
+            "pickup_longitude": pickup_longitude,
+            "pickup_latitude": pickup_latitude,
+            "dropoff_longitude": dropoff_longitude,
+            "dropoff_latitude": dropoff_latitude,
+            "passenger_count": int(passenger_count),
+        }
+
+        with st.spinner("Contacting fare prediction API..."):
+            response = requests.get(url, params=params, timeout=10)
             response.raise_for_status()
-            prediction = response.json()['fare']
+            prediction = response.json()["fare"]
 
-    st.markdown(f"## The predicted fare is: {round(prediction, 2)} $")
+        st.markdown(f"## The predicted fare is: {round(prediction, 2)} $")
