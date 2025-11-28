@@ -28,7 +28,7 @@ def geocode(address: str):
             data = req.json()
             longitude = data[0]["lon"]
             latitude = data[0]["lat"]
-            return [longitude, latitude]
+            return longitude, latitude
         else:
             return None
 
@@ -51,11 +51,27 @@ time = st.time_input("Pickup Time")
 passenger_count = st.number_input("Passenger Count", value=2)
 
 st.markdown("#### Locations")
+
 pickup_location = st.text_input("Where do we pick you up?", value="226 East 54th Street, New York, 10022")
+if pickup_location:
+    lon, lat = geocode(pickup_location)
+    if lon is None:
+        st.warning("Could not find pickup location.")
+    else:
+        st.session_state["pickup_longitude"] = lon
+        st.session_state["pickup_latitude"] = lat
+
 dropoff_location = st.text_input("Where to?", value="22 West 50th Street, New York, 10022")
+if dropoff_location:
+    lon, lat = geocode(dropoff_location)
+    if lon is None:
+        st.warning("Could not find dropoff location.")
+    else:
+        st.session_state["pickup_longitude"] = lon
+        st.session_state["pickup_latitude"] = lat
 
 
-#  USER INPUTS
+# MY API INPUTS
 pickup_longitude = geocode(pickup_location[0])
 pickup_latitude = geocode(pickup_location[1])
 dropoff_longitude = geocode(dropoff_location[0])
