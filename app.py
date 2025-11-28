@@ -2,7 +2,39 @@ import streamlit as st
 import requests
 from datetime import datetime, time, date
 
-# ----------------- PAGE CONFIG -----------------
+# MY DRAFT
+# location format : https://nominatim.openstreetmap.org/ui/search.html?q=1+quai+sainte+croix
+# https://nominatim.openstreetmap.org/ui/search.html?q=226+East+54th+Street%2C+New+York%2C+10022 >> limit 1 and format json
+# output needed from json = centroid":{"type": "Point","coordinates": [-0.5618156, 44.8330383]}
+
+
+#  API URLS
+url = 'https://taxifare-782621711539.europe-west1.run.app/predict'
+geocode_api = 'https://nominatim.openstreetmap.org/ui/search'
+
+# GEOCODING FUNCTION
+def geocode(address: str):
+    if not address:
+        return None
+    else:
+        params={
+            'q' : str.split(address, sep='+'),
+            'format' : 'json',
+            'limit' : 1}
+        headers = {
+        "User-Agent": "https://taxifare-782621711539.europe-west1.run.app/predict"}
+
+        req = requests.get(geocode_api, params=params, headers=headers)
+        if req.status_code == 200:
+            data = req.json()
+            longitude = data[0]["lon"]
+            latitude = data[0]["lat"]
+            return [longitude, latitude]
+        else:
+            return None
+
+
+#  PAGE CONFIG / UI
 st.set_page_config(
     page_title="Taxi Fare Estimator",
     page_icon="🚕",
@@ -11,22 +43,24 @@ st.set_page_config(
 )
 
 st.title("Taxi Fare Estimator 🚕")
-st.caption("Explore how trip details impact the taxi fare.")
+st.caption("Explore how trip details impact the taxi fare.", Width = "stretch")
+st.markdown('<div class="stCard">', unsafe_allow_html=True)
 
-# ----------------- USER INPUTS -----------------
 st.markdown("### Enter the ride details:")
-
 date = st.date_input("When do you want to ride?", value=datetime.now().date())
 time = st.time_input("Pickup Time")
-pickup_longitude = st.number_input("Pickup Longitude", value=-73.985428)
-pickup_latitude = st.number_input("Pickup Latitude", value=40.748817)
-dropoff_longitude = st.number_input("Dropoff Longitude", value=-73.985428)
-dropoff_latitude = st.number_input("Dropoff Latitude", value=40.748817)
 passenger_count = st.number_input("Passenger Count", value=2)
 
+st.markdown("#### Locations")
+pickup_location = st.text_input("Where do we pick you up?", value="226 East 54th Street, New York, 10022")
+dropoff_location = st.text_input("Where to?", value="22 West 50th Street, New York, 10022")
 
-url = 'https://taxifare-782621711539.europe-west1.run.app/predict'
 
+#  USER INPUTS
+pickup_longitude = geocode(pickup_location[0])
+pickup_latitude = geocode(pickup_location[1])
+dropoff_longitude = geocode(dropoff_location[0])
+dropoff_latitude = geocode(dropoff_location[1])
 
 params = {
     "pickup_datetime": f"{date} {time}",
@@ -38,8 +72,8 @@ params = {
 }
 
 
+## PREDICTION OUTPUT
 response = requests.get(url, params=params)
-
 prediction = response.json()['fare']
 
 ## Finally, we can display the prediction to the user
