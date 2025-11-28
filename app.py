@@ -4,7 +4,7 @@ from datetime import datetime, time, date
 
 # MY DRAFT
 # location format : https://nominatim.openstreetmap.org/ui/search.html?q=1+quai+sainte+croix
-# https://nominatim.openstreetmap.org/ui/search.html?q=226+East+54th+Street%2C+New+York%2C+10022 >> limit 1 and format json
+# https://nominatim.openstreetmap.org/search?q=22+West+50th+Street%2C+New+York%2C+10022&format=jsonv2
 # output needed from json = centroid":{"type": "Point","coordinates": [-0.5618156, 44.8330383]}
 
 
@@ -19,8 +19,7 @@ def geocode(address: str):
     else:
         params={
             'q' : str.split(address, sep='+'),
-            'format' : 'json',
-            'limit' : 1}
+            'format' : 'jsonv2'}
         headers = {
         "User-Agent": "https://taxifare-782621711539.europe-west1.run.app/predict"}
 
