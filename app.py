@@ -51,29 +51,38 @@ st.caption("Explore how trip details impact the taxi fare.")
 st.markdown('<div class="stCard">', unsafe_allow_html=True)
 
 st.markdown("### Enter the ride details:")
+
 date = st.date_input("When do you want to ride?", value=datetime.now().date())
 time = st.time_input("Pickup Time")
 passenger_count = st.number_input("Passenger Count", value=2)
 
 st.markdown("#### Locations")
 
-pickup_location = st.text_input("Where do we pick you up?", value="226 East 54th Street, New York, 10022")
-if pickup_location:
-    lon, lat = geocode(pickup_location)
-    if lon is None:
-        st.warning("Could not find pickup location.")
-    else:
-        st.session_state["pickup_longitude"] = lon
-        st.session_state["pickup_latitude"] = lat
+pickup_location = st.text_input(
+    "Where do we pick you up?",
+    value="226 East 54th Street, New York, 10022",
+)
+dropoff_location = st.text_input(
+    "Where to?",
+    value="22 West 50th Street, New York, 10022",
+)
 
-dropoff_location = st.text_input("Where to?", value="22 West 50th Street, New York, 10022")
-if dropoff_location:
-    lon, lat = geocode(dropoff_location)
-    if lon is None:
-        st.warning("Could not find dropoff location.")
-    else:
-        st.session_state["pickup_longitude"] = lon
-        st.session_state["pickup_latitude"] = lat
+# if pickup_location:
+#     lon, lat = geocode(pickup_location)
+#     if lon is None:
+#         st.warning("Could not find pickup location.")
+#     else:
+#         st.session_state["pickup_longitude"] = lon
+#         st.session_state["pickup_latitude"] = lat
+
+# dropoff_location = st.text_input("Where to?", value="22 West 50th Street, New York, 10022")
+# if dropoff_location:
+#     lon, lat = geocode(dropoff_location)
+#     if lon is None:
+#         st.warning("Could not find dropoff location.")
+#     else:
+#         st.session_state["pickup_longitude"] = lon
+#         st.session_state["pickup_latitude"] = lat
 
 
 # MY API INPUTS
