@@ -19,18 +19,23 @@ def geocode(address: str):
     else:
         params={
             'q' : address,
-            'format' : 'jsonv2'}
-        headers = {
-        "User-Agent": "https://taxifare-782621711539.europe-west1.run.app/predict"}
+            'format' : 'jsonv2',
+            'limit': 1}
 
-        req = requests.get(geocode_api, params=params, headers=headers)
-        if req.status_code == 200:
+        headers = {
+        "User-Agent": "taxifare-streamlit-app/1.0 (abir.boualaoui@gmail.com)"}
+
+        try:
+            req = requests.get(geocode_api, params=params, headers=headers)
+            req.raise_for_status()
             data = req.json()
-            longitude = data[0]["lon"]
-            latitude = data[0]["lat"]
+            longitude = float(data[0]["lon"])
+            latitude = float(data[0]["lat"])
             return longitude, latitude
-        else:
-            return None
+
+        except Exception as e:
+            st.error(f"Error while geocoding '{address}': {e}")
+            return None, None
 
 
 #  PAGE CONFIG / UI
@@ -88,9 +93,9 @@ if st.button("🚕 Predict fare"):
     "dropoff_latitude": dropoff_latitude,
     "passenger_count": passenger_count}
 
-response = requests.get(url, params=params)
-prediction = response.json()['fare']
+    with st.spinner("Contacting fare prediction API..."):
+            response = requests.get(url, params=params)
+            response.raise_for_status()
+            prediction = response.json()['fare']
 
-## Finally, we can display the prediction to the user
-
-st.markdown(f"## The predicted fare is: {round(prediction, 2)} $")
+    st.markdown(f"## The predicted fare is: {round(prediction, 2)} $")
