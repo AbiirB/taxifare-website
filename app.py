@@ -11,8 +11,12 @@ st.set_page_config(
 )
 
 st.title("Taxi Fare Estimator 🚕")
+st.caption("Explore how trip details impact the taxi fare.")
 
-date = st.date_input("Pickup Date")
+# ----------------- USER INPUTS -----------------
+st.markdown("### Enter the ride details:")
+
+date = st.date_input("When do you want to ride?", value=datetime.now().date())
 time = st.time_input("Pickup Time")
 pickup_longitude = st.number_input("Pickup Longitude", value=-73.985428)
 pickup_latitude = st.number_input("Pickup Latitude", value=40.748817)
