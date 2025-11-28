@@ -10,16 +10,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-## Here we would like to add some controllers in order to ask the user to select the parameters of the ride
-
-# st.markdown('''
-# - date and time:  `st.date_input` + `st.time_input`
-# - pickup longitude: `st.number_input`
-# - pickup latitude: `st.number_input`
-# - dropoff longitude: `st.number_input`
-# - dropoff latitude: `st.number_input`
-# - passenger count: `st.number_input`)
-# ''')
+st.title("Taxi Fare Estimator 🚕")
 
 date = st.date_input("Pickup Date")
 time = st.time_input("Pickup Time")
