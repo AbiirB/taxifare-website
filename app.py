@@ -43,7 +43,7 @@ st.set_page_config(
 )
 
 st.title("Taxi Fare Estimator 🚕")
-st.caption("Explore how trip details impact the taxi fare.", Width = "stretch")
+st.caption("Explore how trip details impact the taxi fare.")
 st.markdown('<div class="stCard">', unsafe_allow_html=True)
 
 st.markdown("### Enter the ride details:")
