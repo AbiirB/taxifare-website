@@ -15,27 +15,36 @@ geocode_api = 'https://nominatim.openstreetmap.org/ui/search'
 # GEOCODING FUNCTION
 def geocode(address: str):
     if not address:
-        return None
-    else:
-        params={
-            'q' : address,
-            'format' : 'jsonv2',
-            'limit': 1}
+        return None, None
 
-        headers = {
-        "User-Agent": "taxifare-streamlit-app/1.0 (abir.boualaoui@gmail.com)"}
+    params = {
+        "q": address,
+        "format": "jsonv2",
+        "limit": 1,
+    }
+    headers = {
+        # Use a proper, identifying User-Agent as required by Nominatim
+        "User-Agent": "taxifare-streamlit-app/1.0 (youremail@example.com)"
+    }
 
-        try:
-            req = requests.get(geocode_api, params=params, headers=headers)
-            req.raise_for_status()
-            data = req.json()
-            longitude = float(data[0]["lon"])
-            latitude = float(data[0]["lat"])
-            return longitude, latitude
+    try:
+        resp = requests.get(geocode_api, params=params, headers=headers, timeout=10)
+        resp.raise_for_status()  # raises HTTPError for 4xx/5xx
+        data = resp.json()
 
-        except Exception as e:
-            st.error(f"Error while geocoding '{address}': {e}")
+        if not data:
+            st.warning(f"No geocoding result for: {address}")
             return None, None
+
+        lon = float(data[0]["lon"])
+        lat = float(data[0]["lat"])
+        return lon, lat
+
+    except requests.exceptions.RequestException as e:
+        # This catches ConnectionError, Timeout, HTTPError, etc.
+        st.error(f"Could not contact geocoding service: {e}")
+        return None, None
+
 
 
 #  PAGE CONFIG / UI
@@ -52,8 +61,8 @@ st.markdown('<div class="stCard">', unsafe_allow_html=True)
 
 st.markdown("### Enter the ride details:")
 
-date = st.date_input("When do you want to ride?", value=datetime.now().date())
-time = st.time_input("Pickup Time")
+pickup_date = st.date_input("When do you want to ride?", value=datetime.now().date())
+pickup_time = st.time_input("Pickup Time")
 passenger_count = st.number_input("Passenger Count", value=2)
 
 st.markdown("#### Locations")
@@ -95,7 +104,7 @@ dropoff_latitude = geocode(dropoff_location[1])
 ## PREDICTION OUTPUT
 if st.button("🚕 Predict fare"):
     params = {
-    "pickup_datetime": f"{date} {time}",
+    "pickup_datetime": f"{pickup_date} {pickup_time}",
     "pickup_longitude": pickup_longitude,
     "pickup_latitude": pickup_latitude,
     "dropoff_longitude": dropoff_longitude,
